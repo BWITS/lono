@@ -3,15 +3,15 @@ require File.expand_path("../../spec_helper", __FILE__)
 describe Lono do
   before(:each) do
     lono_bin = File.expand_path("../../../bin/lono", __FILE__)
-    @project = File.expand_path("../../../tmp/lono_project", __FILE__)
-    dir = File.dirname(@project)
-    name = File.basename(@project)
+    @project_root = File.expand_path("../../../tmp/lono_project", __FILE__)
+    dir = File.dirname(@project_root)
+    name = File.basename(@project_root)
     FileUtils.mkdir(dir) unless File.exist?(dir)
     execute("cd #{dir} && #{lono_bin} new #{name} -f -q ")
   end
 
   after(:each) do
-    FileUtils.rm_rf(@project) unless ENV['LEAVE_TMP_PROJECT']
+    FileUtils.rm_rf(@project_root) unless ENV['LEAVE_TMP_PROJECT']
   end
 
   describe "bashify" do
@@ -82,27 +82,27 @@ describe Lono do
   describe "ruby specs" do
     before(:each) do
       @dsl = Lono::DSL.new(
-        :project_root => @project,
+        :project_root => @project_root,
         :quiet => true
       )
       @dsl.run
     end
 
     it "should generate cloud formation template" do
-      raw = IO.read("#{@project}/output/prod-api-app.json")
+      raw = IO.read("#{@project_root}/output/prod-api-app.json")
       json = JSON.load(raw)
       json['Description'].should == "Api Stack"
       json['Mappings']['AWSRegionArch2AMI']['us-east-1']['64'].should == 'ami-123'
     end
 
     it "should make trailing options pass to the partial helper available as instance variables" do
-      raw = IO.read("#{@project}/output/prod-api-app.json")
+      raw = IO.read("#{@project_root}/output/prod-api-app.json")
       json = JSON.load(raw)
       json['Resources']['HostRecord']['Properties']['Comment'].should == 'DNS name for mydomain.com'
     end
 
     it "should generate user data with variables" do
-      raw = IO.read("#{@project}/output/prod-api-redis.json")
+      raw = IO.read("#{@project_root}/output/prod-api-redis.json")
       json = JSON.load(raw)
       json['Description'].should == "Api redis"
       user_data = json['Resources']['server']['Properties']['UserData']['Fn::Base64']['Fn::Join'][1]
@@ -110,7 +110,7 @@ describe Lono do
     end
 
     it "should include multiple user_data scripts" do
-      raw = IO.read("#{@project}/output/prod-api-redis.json")
+      raw = IO.read("#{@project_root}/output/prod-api-redis.json")
       json = JSON.load(raw)
       json['Description'].should == "Api redis"
       user_data = json['Resources']['server']['Properties']['UserData']['Fn::Base64']['Fn::Join'][1]
@@ -118,7 +118,7 @@ describe Lono do
     end
 
     it "should generate db template" do
-      raw = IO.read("#{@project}/output/prod-api-redis.json")
+      raw = IO.read("#{@project_root}/output/prod-api-redis.json")
       json = JSON.load(raw)
       json['Description'].should == "Api redis"
       user_data = json['Resources']['server']['Properties']['UserData']['Fn::Base64']['Fn::Join'][1]
@@ -169,7 +169,7 @@ describe Lono do
     end
 
     it "should not transform user_data ruby scripts" do
-      raw = IO.read("#{@project}/output/prod-api-worker.json")
+      raw = IO.read("#{@project_root}/output/prod-api-worker.json")
       json = JSON.load(raw)
       user_data = json['Resources']['LaunchConfig']['Properties']['UserData']['Fn::Base64']['Fn::Join'][1]
       user_data.should include(%Q|ec2.tags.create(ec2.instances[my_instance_id], "Name", {:value => Facter.hostname})\n|)
@@ -178,10 +178,10 @@ describe Lono do
 
     it "task should generate cloud formation templates" do
       Lono::DSL.new(
-        :project_root => @project,
+        :project_root => @project_root,
         :quiet => true
       ).run
-      raw = IO.read("#{@project}/output/prod-api-app.json")
+      raw = IO.read("#{@project_root}/output/prod-api-app.json")
       json = JSON.load(raw)
       json['Description'].should == "Api Stack"
       json['Mappings']['AWSRegionArch2AMI']['us-east-1']['64'].should == 'ami-123'
@@ -190,7 +190,7 @@ describe Lono do
 
   describe "cli specs" do
     it "should generate templates" do
-      out = execute("./bin/lono generate -c --project-root #{@project}")
+      out = execute("./bin/lono generate -c --project-root #{@project_root}")
       out.should match /Generating Cloud Formation templates/
     end
   end

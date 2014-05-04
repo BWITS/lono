@@ -19,7 +19,7 @@ module Lono
     end
 
     def source(path)
-      @source = path[0..0] == '/' ? path : "#{@options[:project_root]}/templates/#{path}"
+      @source = path[0..0] == '/' ? path : "#{@options[:project_root]}/app/templates/#{path}"
     end
 
     def variables(vars={})
@@ -29,14 +29,14 @@ module Lono
     end
 
     def partial(path,vars={})
-      path = "#{@options[:project_root]}/templates/partial/#{path}"
+      path = "#{@options[:project_root]}/app/templates/partial/#{path}"
       template = IO.read(path)
       variables(vars)
       ERB.new(template).result(binding)
     end
 
     def user_data(path, vars={})
-      path = "#{@options[:project_root]}/templates/user_data/#{path}"
+      path = "#{@options[:project_root]}/app/user_data/#{path}"
       template = IO.read(path)
       variables(vars)
       result = ERB.new(template).result(binding)

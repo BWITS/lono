@@ -13,6 +13,8 @@
 
 Lono is a Cloud Formation Template ruby generator.  Lono generates Cloud Formation templates based on ERB templates.
 
+WARNING: lono version 4.x to 5.x changed the structure of a lono project.   Please read about how to upgrade on the wiki: 
+
 ## Usage
 
 <pre>
@@ -25,18 +27,14 @@ This sets up a starter lono project with example templates.
 $ lono generate
 </pre>
 
-This generates the templates that have been defined in the config folder of the lono project to the output folder.
+This generates the templates that have been defined in the app/stacks folder to the output folder.
 
-The starter lono template project config files looks like [this](lib/starter_project/config/lono.rb) and [this](lib/starter_project/config/lono/api.rb).  Here's a snippet from one of the config files with the template call:
+The starter lono template project config files looks like [this](lib/starter_project/app/stacks/blog.rb) and [this](lib/starter_project/app/stacks/api.rb).  Here's a snippet from one of the config files with the template call:
 
 ```ruby
 template "prod-api-app.json" do
-  env,app,role = name.sub('.json','').split('-')
   source "app.json.erb"
   variables(
-    :env => env,
-    :app => app,
-    :role => role,
     :ami => "ami-123",
     :instance_type => "m1.small",
     :port => "80",
@@ -53,7 +51,7 @@ template "prod-api-app.json" do
 end
 ```
 
-The corresponding ERB template example file is [here](lib/starter_project/templates/app.json.erb).
+The corresponding ERB template example file is [here](lib/starter_project/app/templates/app.json.erb).
 
 ## Template helper methods
 
@@ -172,7 +170,7 @@ The user_data helper will transform the bash script into a json array of element
 ]
 ```
 
-More examples of user_data and instrinic function helper method usage are found in the starter [project template](https://github.com/tongueroo/lono/blob/master/lib/starter_project/templates/user_data/db.sh.erb)
+More examples of user_data and instrinic function helper method usage are found in the starter [project template](https://github.com/tongueroo/lono/blob/master/lib/starter_project/app/templates/user_data/db.sh.erb)
 
 ## Converting UserData scripts
 
@@ -188,7 +186,7 @@ This is useful if you want to take an existing [Cloud Formation Template example
 
 ## Breaking up config/lono.rb
 
-If you have a lot of templates, the config/lono.rb file can get unwieldy long.  You can break up the lono.rb file and put template defintions in the config/lono directory.  Any file in this directory will be automatically loaded. An [example](lib/starter_project/config/lono/api.rb) is in the starter project.
+If you have a lot of templates, the config/lono.rb file can get unwieldy long.  You can break up the lono.rb file and put template defintions in the config/lono directory.  Any file in this directory will be automatically loaded. An [example](lib/starter_project/app/stacks/api.rb) is in the starter project.
 
 
 ## Generate

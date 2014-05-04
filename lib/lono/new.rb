@@ -9,7 +9,7 @@ module Lono
     def run
       puts "Setting up lono project" unless options[:quiet]
       source_root = File.expand_path("../../starter_project", __FILE__)
-      paths = Dir.glob("#{source_root}/**/*").
+      paths = Dir.glob("#{source_root}/**/{*,.*}").
                 select {|p| File.file?(p) }
       paths.each do |src|
         dest = src.gsub(%r{.*starter_project/},'')

@@ -3,19 +3,16 @@ module Lono
     def initialize(options={})
       @options = options
       @options[:project_root] ||= '.'
-      @path = "#{@options[:project_root]}/config/lono.rb"
       @templates = []
       @results = {}
     end
 
     def evaluate
-      instance_eval(File.read(@path), @path)
-      load_subfolder
+      load_stacks
     end
 
-    # load any templates defined in project/config/lono/*
-    def load_subfolder
-      Dir.glob("#{File.dirname(@path)}/lono/*").each do |path|
+    def load_stacks
+      Dir.glob("#{@options[:project_root]}/app/stacks/**/*").each do |path|
         instance_eval(File.read(path), path)
       end
     end
@@ -57,7 +54,21 @@ module Lono
       @options[:pretty] ? JSON.pretty_generate(JSON.parse(json)) : json
     end
 
+    def helpers
+      Dir.glob("#{@options[:project_root]}/app/helpers/**/*.rb").each do |path|
+        require path
+        klass_name = camelize(File.basename(path).sub(/.rb$/,''))
+        klass = Kernel.const_get(klass_name)
+        Template.send(:include, klass)
+      end
+    end
+
+    def camelize(str)
+      str.split('_').map {|w| w.capitalize}.join
+    end
+
     def run(options={})
+      helpers
       evaluate
       build
       output

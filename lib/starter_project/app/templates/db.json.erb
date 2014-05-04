@@ -77,6 +77,8 @@
       "Description": "s1, s2, s3, etc",
       "Type": "String"
     },
+    <%= partial_if_exist "does_not_exist.json.erb" %>
+    <%= partial_if_exist "exist.json.erb" %>
     "VolumeSize": {
       "ConstraintDescription": "must be between 5 and 1024 Gb.",
       "Default": "<%= @volume_size %>",
