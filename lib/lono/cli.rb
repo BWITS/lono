@@ -28,6 +28,11 @@ module Lono
       Lono::Bashify.new(:path => path).run
     end
 
+    desc "upgrade", "Upgrade lono project from 0.4.x to 0.5.x version"
+    def upgrade
+      Lono::Upgrade.new(options.clone).run
+    end
+
     desc "version", "Prints version"
     def version
       puts Lono::VERSION
